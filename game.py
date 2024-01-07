@@ -36,6 +36,7 @@
 
 import pygame
 import numpy as np
+import time
 
 # Initialize Pygame
 pygame.init()
@@ -143,7 +144,13 @@ def draw_cells():
             if game_state[x, y] == 1:
                 pygame.draw.rect(screen, black, cell)
 
+clock = pygame.time.Clock()
+
 running = True
+game_running = False
+next_gen_requested = False
+next_gen_time = 0
+pause = game_running
 while running:
     screen.fill(white)
     draw_grid()
@@ -159,13 +166,27 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if buttonNextGeneration_x <= event.pos[0] <= buttonNextGeneration_x + buttonNextGeneration_width and buttonNextGeneration_y <= event.pos[1] <= buttonNextGeneration_y + buttonNextGeneration_height:
+            mouse_x, mouse_y = event.pos
+
+            if buttonNextGeneration_x <= mouse_x <= buttonNextGeneration_x + buttonNextGeneration_width and buttonNextGeneration_y <= mouse_y <= buttonNextGeneration_y + buttonNextGeneration_height:
+                next_gen_requested = True
                 next_generation()
-            else:
-                x, y = event.pos[0] // cell_width, event.pos[1] // cell_height
-                game_state[x, y] = not game_state[x, y]
+            if buttonStart_x <= mouse_x <= buttonStart_x + buttonStart_width and buttonStart_y <= mouse_y <= buttonStart_y + buttonStart_height:
+                game_running = True
+                pause = False
+                next_gen_time = pygame.time.get_ticks()
+            if buttonPause_x <= mouse_x <= buttonPause_x + buttonPause_width and buttonPause_y <= mouse_y <= buttonPause_y + buttonPause_height:
+                pause = True
+
+    if game_running and not pause:
+        current_time = pygame.time.get_ticks()
+        if next_gen_requested or current_time - next_gen_time >= 1000:
+            next_generation()
+            next_gen_requested = False
+            next_gen_time = current_time
+
+    clock.tick(60)  # Ogranicz liczbę klatek na sekundę do 60
 
 pygame.quit()
-
 
 
