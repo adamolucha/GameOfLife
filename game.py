@@ -42,7 +42,7 @@ import time
 pygame.init()
 
 # Screen dimensions
-width, height = 1024, 768
+width, height = 800, 600
 screen = pygame.display.set_mode((width, height))
 
 # Grid dimensions
@@ -52,29 +52,32 @@ cell_height = height // n_cells_y
 
 # Game state
 game_state = np.random.choice([0, 1], size=(n_cells_x, n_cells_y), p=[0.8, 0.2])
-
+saved_game_state = game_state
 # Colors
 white = (255, 255, 255)
 black = (0, 0, 0)
 gray = (128, 128, 128)
 green = (0, 255, 0)
+red = (255, 0, 0)
 
 # Button dimensions
 buttonNextGeneration_width, buttonNextGeneration_height = 200, 50
-buttonNextGeneration_x, buttonNextGeneration_y = (width - buttonNextGeneration_width) // 20, height - buttonNextGeneration_height - 10
+buttonNextGeneration_x, buttonNextGeneration_y = (width - buttonNextGeneration_width) // 20, height - buttonNextGeneration_height - 70
 
 buttonStart_width, buttonStart_height = 200, 50
-buttonStart_x, buttonStart_y = (width - buttonStart_width) // 20, height - buttonStart_height - 70
+buttonStart_x, buttonStart_y = (width - buttonStart_width) // 20, height - buttonStart_height - 130
 
 buttonPause_width, buttonPause_height = 200, 50
-buttonPause_x, buttonPause_y = (width - buttonPause_width) // 20, height - buttonPause_height - 130
+buttonPause_x, buttonPause_y = (width - buttonPause_width) // 20, height - buttonPause_height - 190
 
 buttonSave_width, buttonSave_height = 200, 50
-buttonSave_x, buttonSave_y = (width - buttonSave_width) // 20, height - buttonSave_height - 190
+buttonSave_x, buttonSave_y = (width - buttonSave_width) // 20, height - buttonSave_height - 250
 
 buttonLoad_width, buttonLoad_height = 200, 50
-buttonLoad_x, buttonLoad_y = (width - buttonLoad_width) // 20, height - buttonLoad_height - 250
+buttonLoad_x, buttonLoad_y = (width - buttonLoad_width) // 20, height - buttonLoad_height - 310
 
+buttonClose_width, buttonClose_height = 200, 50
+buttonClose_x, buttonClose_y = (width - buttonClose_width) // 20, height - buttonClose_height - 10
 
 def draw_buttonNextGeneratrion():
     pygame.draw.rect(screen, green, (buttonNextGeneration_x, buttonNextGeneration_y, buttonNextGeneration_width, buttonNextGeneration_height))
@@ -108,6 +111,13 @@ def draw_buttonLoad():
     font = pygame.font.Font(None, 36)
     text = font.render("Load", True, black)
     text_rect = text.get_rect(center=(buttonLoad_x + buttonLoad_width // 2, buttonLoad_y + buttonLoad_height // 2))
+    screen.blit(text, text_rect)
+
+def draw_buttonClose():
+    pygame.draw.rect(screen, red, (buttonClose_x, buttonClose_y, buttonClose_width, buttonClose_height))
+    font = pygame.font.Font(None, 36)
+    text = font.render("Close", True, black)
+    text_rect = text.get_rect(center=(buttonClose_x + buttonClose_width // 2, buttonClose_y + buttonClose_height // 2))
     screen.blit(text, text_rect)
 def draw_grid():
     for y in range(0, height, cell_height):
@@ -160,6 +170,7 @@ while running:
     draw_buttonPause()
     draw_buttonSave()
     draw_buttonLoad()
+    draw_buttonClose()
     pygame.display.flip()
 
     for event in pygame.event.get():
@@ -177,15 +188,26 @@ while running:
                 next_gen_time = pygame.time.get_ticks()
             if buttonPause_x <= mouse_x <= buttonPause_x + buttonPause_width and buttonPause_y <= mouse_y <= buttonPause_y + buttonPause_height:
                 pause = True
+            if buttonSave_x <= mouse_x <= buttonSave_x + buttonSave_width and buttonSave_y <= mouse_y <= buttonSave_y + buttonSave_height:
+                saved_game_state = game_state
+            if buttonLoad_x <= mouse_x <= buttonLoad_x + buttonLoad_width and buttonLoad_y <= mouse_y <= buttonLoad_y + buttonLoad_height:
+                game_state = game_state
+                game_state = saved_game_state
+            if buttonClose_x <= mouse_x <= buttonClose_x + buttonClose_width and buttonClose_y <= mouse_y <= buttonClose_y + buttonClose_height:
+                running = not running
+
+            else:
+                x, y = event.pos[0] // cell_width, event.pos[1] // cell_height
+                game_state[x, y] = not game_state[x, y]
 
     if game_running and not pause:
         current_time = pygame.time.get_ticks()
-        if next_gen_requested or current_time - next_gen_time >= 1000:
+        if next_gen_requested or current_time - next_gen_time >= 500:
             next_generation()
             next_gen_requested = False
             next_gen_time = current_time
 
-    clock.tick(60)  # Ogranicz liczbę klatek na sekundę do 60
+    clock.tick(60)
 
 pygame.quit()
 
