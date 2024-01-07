@@ -41,11 +41,11 @@ import numpy as np
 pygame.init()
 
 # Screen dimensions
-width, height = 800, 600
+width, height = 1024, 768
 screen = pygame.display.set_mode((width, height))
 
 # Grid dimensions
-n_cells_x, n_cells_y = 40, 30
+n_cells_x, n_cells_y = 50, 40
 cell_width = width // n_cells_x
 cell_height = height // n_cells_y
 
@@ -59,16 +59,55 @@ gray = (128, 128, 128)
 green = (0, 255, 0)
 
 # Button dimensions
-button_width, button_height = 200, 50
-button_x, button_y = (width - button_width) // 2, height - button_height - 10
+buttonNextGeneration_width, buttonNextGeneration_height = 200, 50
+buttonNextGeneration_x, buttonNextGeneration_y = (width - buttonNextGeneration_width) // 20, height - buttonNextGeneration_height - 10
 
-def draw_button():
-    pygame.draw.rect(screen, green, (button_x, button_y, button_width, button_height))
+buttonStart_width, buttonStart_height = 200, 50
+buttonStart_x, buttonStart_y = (width - buttonStart_width) // 20, height - buttonStart_height - 70
+
+buttonPause_width, buttonPause_height = 200, 50
+buttonPause_x, buttonPause_y = (width - buttonPause_width) // 20, height - buttonPause_height - 130
+
+buttonSave_width, buttonSave_height = 200, 50
+buttonSave_x, buttonSave_y = (width - buttonSave_width) // 20, height - buttonSave_height - 190
+
+buttonLoad_width, buttonLoad_height = 200, 50
+buttonLoad_x, buttonLoad_y = (width - buttonLoad_width) // 20, height - buttonLoad_height - 250
+
+
+def draw_buttonNextGeneratrion():
+    pygame.draw.rect(screen, green, (buttonNextGeneration_x, buttonNextGeneration_y, buttonNextGeneration_width, buttonNextGeneration_height))
     font = pygame.font.Font(None, 36)
     text = font.render("Next Generation", True, black)
-    text_rect = text.get_rect(center=(button_x + button_width // 2, button_y + button_height // 2))
+    text_rect = text.get_rect(center=(buttonNextGeneration_x + buttonNextGeneration_width // 2, buttonNextGeneration_y + buttonNextGeneration_height // 2))
+    screen.blit(text, text_rect)
+def draw_buttonStart():
+    pygame.draw.rect(screen, green, (buttonStart_x, buttonStart_y, buttonStart_width, buttonStart_height))
+    font = pygame.font.Font(None, 36)
+    text = font.render("Start", True, black)
+    text_rect = text.get_rect(center=(buttonStart_x + buttonStart_width // 2, buttonStart_y + buttonStart_height // 2))
     screen.blit(text, text_rect)
 
+def draw_buttonPause():
+    pygame.draw.rect(screen, green, (buttonPause_x, buttonPause_y, buttonPause_width, buttonPause_height))
+    font = pygame.font.Font(None, 36)
+    text = font.render("Pause", True, black)
+    text_rect = text.get_rect(center=(buttonPause_x + buttonPause_width // 2, buttonPause_y + buttonPause_height // 2))
+    screen.blit(text, text_rect)
+
+def draw_buttonSave():
+    pygame.draw.rect(screen, green, (buttonSave_x, buttonSave_y, buttonSave_width, buttonSave_height))
+    font = pygame.font.Font(None, 36)
+    text = font.render("Save", True, black)
+    text_rect = text.get_rect(center=(buttonSave_x + buttonSave_width // 2, buttonSave_y + buttonSave_height // 2))
+    screen.blit(text, text_rect)
+
+def draw_buttonLoad():
+    pygame.draw.rect(screen, green, (buttonLoad_x, buttonLoad_y, buttonLoad_width, buttonLoad_height))
+    font = pygame.font.Font(None, 36)
+    text = font.render("Load", True, black)
+    text_rect = text.get_rect(center=(buttonLoad_x + buttonLoad_width // 2, buttonLoad_y + buttonLoad_height // 2))
+    screen.blit(text, text_rect)
 def draw_grid():
     for y in range(0, height, cell_height):
         for x in range(0, width, cell_width):
@@ -109,14 +148,18 @@ while running:
     screen.fill(white)
     draw_grid()
     draw_cells()
-    draw_button()
+    draw_buttonNextGeneratrion()
+    draw_buttonStart()
+    draw_buttonPause()
+    draw_buttonSave()
+    draw_buttonLoad()
     pygame.display.flip()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if button_x <= event.pos[0] <= button_x + button_width and button_y <= event.pos[1] <= button_y + button_height:
+            if buttonNextGeneration_x <= event.pos[0] <= buttonNextGeneration_x + buttonNextGeneration_width and buttonNextGeneration_y <= event.pos[1] <= buttonNextGeneration_y + buttonNextGeneration_height:
                 next_generation()
             else:
                 x, y = event.pos[0] // cell_width, event.pos[1] // cell_height
