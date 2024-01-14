@@ -60,70 +60,55 @@ gray = (128, 128, 128)
 green = (0, 255, 0)
 red = (255, 0, 0)
 
+
+class Button:
+    def __init__(self, width, height, x, y, color, name):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color = color
+        self.name = name
+
+    def is_clicked(self, mouse_pos_x, mouse_pos_y):
+        return self.x <= mouse_pos_x <= self.x + self.width and self.y <= mouse_pos_y <= self.y + self.height
+
+
+class ButtonFactory:
+    @staticmethod
+    def create_green_button(y_offset, name):
+        return Button(200, 50, (width - 200) // 20, (height - 50) - y_offset, green, name)
+
+    @staticmethod
+    def create_red_button(y_offset, name):
+        return Button(200, 50, (width - 200) // 20, (height - 50) - y_offset, red, name)
+
+
 # Button dimensions
-buttonNextGeneration_width, buttonNextGeneration_height = 200, 50
-buttonNextGeneration_x, buttonNextGeneration_y = (width - buttonNextGeneration_width) // 20, height - buttonNextGeneration_height - 70
+button_next_generation = ButtonFactory.create_green_button(70, "Next generation")
+button_start = ButtonFactory.create_green_button(130, "Start")
+button_pause = ButtonFactory.create_green_button(190, "Pause")
+button_save = ButtonFactory.create_green_button(250, "Save")
+button_load = ButtonFactory.create_green_button(310, "Load")
+button_close = ButtonFactory.create_red_button(10, "close")
 
-buttonStart_width, buttonStart_height = 200, 50
-buttonStart_x, buttonStart_y = (width - buttonStart_width) // 20, height - buttonStart_height - 130
 
-buttonPause_width, buttonPause_height = 200, 50
-buttonPause_x, buttonPause_y = (width - buttonPause_width) // 20, height - buttonPause_height - 190
-
-buttonSave_width, buttonSave_height = 200, 50
-buttonSave_x, buttonSave_y = (width - buttonSave_width) // 20, height - buttonSave_height - 250
-
-buttonLoad_width, buttonLoad_height = 200, 50
-buttonLoad_x, buttonLoad_y = (width - buttonLoad_width) // 20, height - buttonLoad_height - 310
-
-buttonClose_width, buttonClose_height = 200, 50
-buttonClose_x, buttonClose_y = (width - buttonClose_width) // 20, height - buttonClose_height - 10
-
-def draw_buttonNextGeneratrion():
-    pygame.draw.rect(screen, green, (buttonNextGeneration_x, buttonNextGeneration_y, buttonNextGeneration_width, buttonNextGeneration_height))
+def draw_button(button):
+    pygame.draw.rect(screen, button.color, (
+        button.x, button.y, button.width, button.height))
     font = pygame.font.Font(None, 36)
-    text = font.render("Next Generation", True, black)
-    text_rect = text.get_rect(center=(buttonNextGeneration_x + buttonNextGeneration_width // 2, buttonNextGeneration_y + buttonNextGeneration_height // 2))
-    screen.blit(text, text_rect)
-def draw_buttonStart():
-    pygame.draw.rect(screen, green, (buttonStart_x, buttonStart_y, buttonStart_width, buttonStart_height))
-    font = pygame.font.Font(None, 36)
-    text = font.render("Start", True, black)
-    text_rect = text.get_rect(center=(buttonStart_x + buttonStart_width // 2, buttonStart_y + buttonStart_height // 2))
+    text = font.render(button.name, True, black)
+    text_rect = text.get_rect(center=(button.x + button.width // 2,
+                                      button.y + button.height // 2))
     screen.blit(text, text_rect)
 
-def draw_buttonPause():
-    pygame.draw.rect(screen, green, (buttonPause_x, buttonPause_y, buttonPause_width, buttonPause_height))
-    font = pygame.font.Font(None, 36)
-    text = font.render("Pause", True, black)
-    text_rect = text.get_rect(center=(buttonPause_x + buttonPause_width // 2, buttonPause_y + buttonPause_height // 2))
-    screen.blit(text, text_rect)
 
-def draw_buttonSave():
-    pygame.draw.rect(screen, green, (buttonSave_x, buttonSave_y, buttonSave_width, buttonSave_height))
-    font = pygame.font.Font(None, 36)
-    text = font.render("Save", True, black)
-    text_rect = text.get_rect(center=(buttonSave_x + buttonSave_width // 2, buttonSave_y + buttonSave_height // 2))
-    screen.blit(text, text_rect)
-
-def draw_buttonLoad():
-    pygame.draw.rect(screen, green, (buttonLoad_x, buttonLoad_y, buttonLoad_width, buttonLoad_height))
-    font = pygame.font.Font(None, 36)
-    text = font.render("Load", True, black)
-    text_rect = text.get_rect(center=(buttonLoad_x + buttonLoad_width // 2, buttonLoad_y + buttonLoad_height // 2))
-    screen.blit(text, text_rect)
-
-def draw_buttonClose():
-    pygame.draw.rect(screen, red, (buttonClose_x, buttonClose_y, buttonClose_width, buttonClose_height))
-    font = pygame.font.Font(None, 36)
-    text = font.render("Close", True, black)
-    text_rect = text.get_rect(center=(buttonClose_x + buttonClose_width // 2, buttonClose_y + buttonClose_height // 2))
-    screen.blit(text, text_rect)
 def draw_grid():
     for y in range(0, height, cell_height):
         for x in range(0, width, cell_width):
             cell = pygame.Rect(x, y, cell_width, cell_height)
             pygame.draw.rect(screen, gray, cell, 1)
+
 
 def next_generation():
     global game_state
@@ -132,12 +117,12 @@ def next_generation():
     for y in range(n_cells_y):
         for x in range(n_cells_x):
             n_neighbors = game_state[(x - 1) % n_cells_x, (y - 1) % n_cells_y] + \
-                          game_state[(x)     % n_cells_x, (y - 1) % n_cells_y] + \
+                          game_state[(x) % n_cells_x, (y - 1) % n_cells_y] + \
                           game_state[(x + 1) % n_cells_x, (y - 1) % n_cells_y] + \
-                          game_state[(x - 1) % n_cells_x, (y)     % n_cells_y] + \
-                          game_state[(x + 1) % n_cells_x, (y)     % n_cells_y] + \
+                          game_state[(x - 1) % n_cells_x, (y) % n_cells_y] + \
+                          game_state[(x + 1) % n_cells_x, (y) % n_cells_y] + \
                           game_state[(x - 1) % n_cells_x, (y + 1) % n_cells_y] + \
-                          game_state[(x)     % n_cells_x, (y + 1) % n_cells_y] + \
+                          game_state[(x) % n_cells_x, (y + 1) % n_cells_y] + \
                           game_state[(x + 1) % n_cells_x, (y + 1) % n_cells_y]
 
             if game_state[x, y] == 1 and (n_neighbors < 2 or n_neighbors > 3):
@@ -147,6 +132,7 @@ def next_generation():
 
     game_state = new_state
 
+
 def draw_cells():
     for y in range(n_cells_y):
         for x in range(n_cells_x):
@@ -154,55 +140,64 @@ def draw_cells():
             if game_state[x, y] == 1:
                 pygame.draw.rect(screen, black, cell)
 
-clock = pygame.time.Clock()
 
+clock = pygame.time.Clock()
 running = True
 game_running = False
 next_gen_requested = False
 next_gen_time = 0
 pause = game_running
-while running:
+
+
+def draw():
     screen.fill(white)
     draw_grid()
     draw_cells()
-    draw_buttonNextGeneratrion()
-    draw_buttonStart()
-    draw_buttonPause()
-    draw_buttonSave()
-    draw_buttonLoad()
-    draw_buttonClose()
+    draw_button(button_next_generation)
+    draw_button(button_start)
+    draw_button(button_pause)
+    draw_button(button_save)
+    draw_button(button_load)
+    draw_button(button_close)
     pygame.display.flip()
 
+
+def handle_events():
+    global pause, next_gen_requested, game_running, next_gen_time, game_state, saved_game_state, running
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
 
-            if buttonNextGeneration_x <= mouse_x <= buttonNextGeneration_x + buttonNextGeneration_width and buttonNextGeneration_y <= mouse_y <= buttonNextGeneration_y + buttonNextGeneration_height:
+            if button_next_generation.is_clicked(mouse_x, mouse_y):
                 next_gen_requested = True
                 next_generation()
-            if buttonStart_x <= mouse_x <= buttonStart_x + buttonStart_width and buttonStart_y <= mouse_y <= buttonStart_y + buttonStart_height:
+            if button_start.is_clicked(mouse_x, mouse_y):
                 game_running = True
                 pause = False
                 next_gen_time = pygame.time.get_ticks()
-            if buttonPause_x <= mouse_x <= buttonPause_x + buttonPause_width and buttonPause_y <= mouse_y <= buttonPause_y + buttonPause_height:
+            if button_pause.is_clicked(mouse_x, mouse_y):
                 pause = True
-            if buttonSave_x <= mouse_x <= buttonSave_x + buttonSave_width and buttonSave_y <= mouse_y <= buttonSave_y + buttonSave_height:
+            if button_save.is_clicked(mouse_x, mouse_y):
                 saved_game_state = game_state
-            if buttonLoad_x <= mouse_x <= buttonLoad_x + buttonLoad_width and buttonLoad_y <= mouse_y <= buttonLoad_y + buttonLoad_height:
+            if button_load.is_clicked(mouse_x, mouse_y):
                 game_state = game_state
                 game_state = saved_game_state
-            if buttonClose_x <= mouse_x <= buttonClose_x + buttonClose_width and buttonClose_y <= mouse_y <= buttonClose_y + buttonClose_height:
+            if button_close.is_clicked(mouse_x, mouse_y):
                 running = not running
-
             else:
                 x, y = event.pos[0] // cell_width, event.pos[1] // cell_height
                 game_state[x, y] = not game_state[x, y]
 
+
+while running:
+    draw()
+    handle_events()
+
     if game_running and not pause:
         current_time = pygame.time.get_ticks()
-        if next_gen_requested or current_time - next_gen_time >= 500:
+        if next_gen_requested or current_time - next_gen_time >= 100:
             next_generation()
             next_gen_requested = False
             next_gen_time = current_time
@@ -210,5 +205,3 @@ while running:
     clock.tick(60)
 
 pygame.quit()
-
-
